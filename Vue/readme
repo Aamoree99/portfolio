@@ -1,0 +1,29 @@
+Financial Tracker
+
+Description
+
+Financial Tracker is an intuitive and user-friendly application designed to help users manage their finances effectively. 
+It allows users to set budgets, both overall and for specific categories, and track expenses and income. 
+A key feature of this application is its ability to display the remaining budget in each category based on the expenses incurred, enabling users to stay on top of their financial goals.
+
+Features
+
+Budget Setting: Users can set an overall budget as well as allocate specific amounts to different categories.
+Expense and Income Tracking: The application provides a convenient way to track all expenses and incomes, ensuring that users have a clear understanding of their financial activities.
+Visual Budget Analysis: Utilizing Chart.js, the application offers visual representations of budgets and expenses, making it easier to understand financial data at a glance.
+Category-wise Budget Monitoring: Users can monitor how much budget remains in each category based on their spending, which helps in making informed spending decisions.
+Technologies
+
+JavaScript: The primary programming language used for developing the core functionality of the application.
+Vue.js: A progressive JavaScript framework used for building user interfaces, enhancing the interactivity and responsiveness of the application.
+Chart.js: An open-source JavaScript library employed to create visually appealing and informative charts for representing financial data.
+
+
+Usage
+
+Setting Budgets:
+Navigate to the budget setting section to allocate your overall budget and set budgets for individual categories.
+Tracking Expenses and Income:
+Record your daily expenses and income to keep your financial records up-to-date.
+Viewing Budget Utilization:
+Check the visual charts to see how much of your allocated budget has been spent and how much remains in each category.

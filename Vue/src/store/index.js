@@ -4,7 +4,7 @@ export default createStore({
     state: {
       incomes: JSON.parse(localStorage.getItem('incomes')) || [],    
       expenses: JSON.parse(localStorage.getItem('expenses')) || [],  
-      budget: JSON.parse(localStorage.getItem('bugdets')) || 0,
+      budget: JSON.parse(localStorage.getItem('budgets')) || 0,
       categories: JSON.parse(localStorage.getItem('categories')) || [],
       categoryBudgets: JSON.parse(localStorage.getItem('categoryBudgets')) || {}
     },
@@ -20,6 +20,7 @@ export default createStore({
       SET_BUDGET(state, budget) {
         state.budget = budget || 0;
         localStorage.setItem('budgets', JSON.stringify(state.budget));
+        console.log(state.budget);
       },
       SET_CATEGORY_BUDGET(state, { category, amount }) {
         state.categoryBudgets[category] = amount;

@@ -11,72 +11,114 @@ import { mapState } from 'vuex';
 
 Chart.register(...registerables);
 
-export default {
-  name: 'FinancialChart',
-  props: {
-    chartData: {
-      type: Object,
-      required: true
-    }
-  },
-  computed: {
-    ...mapState({
-      incomes: 'incomes', 
-      expenses: 'expenses' 
-    })
-  },
-  mounted() {
-    const incomeData = {
-      label: 'Income',
-      data: this.incomes.map(income => income.amount),
-      backgroundColor: 'green',
-    };
+const doughnutTextPlugin = {
+  id: 'doughnutTextPlugin',
+  afterDraw: function(chart, args, options) {
+    const ctx = chart.ctx;
+    const centerText = options.centerText || '';
+    const fontSize = (chart.innerRadius / 10).toFixed(2);
 
-    const expenseData = {
-      label: 'Expense',
-      data: this.expenses.map(expense => expense.amount),
-      backgroundColor: 'red',
-    };
+    ctx.save();
+    ctx.font = fontSize + "em Arial";
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "center";
 
-    const chartData = {
-      labels: ['test'],
-      datasets: [incomeData, expenseData],
-    };
-    console.log(chartData);
-    new Chart(this.$refs.canvas, {
-      type: 'bar',
-      data: chartData,
-      options: {
-        // Настройки графика
-      }
-    });
-    const expensesByCategory = this.expenses.reduce((acc, expense) => {
-      const category = expense.category || 'Undefined';
-      if (!acc[category]) {
-        acc[category] = 0;
-      }
-      acc[category] += expense.amount;
-      return acc;
-    }, {});
+    const centerX = (chart.chartArea.left + chart.chartArea.right) / 2;
+    const centerY = (chart.chartArea.top + chart.chartArea.bottom) / 2;
+    ctx.fillText(centerText, centerX, centerY);
 
-    const categoryData = {
-      labels: Object.keys(expensesByCategory),
-      datasets: [{
-        data: Object.values(expensesByCategory),
-        backgroundColor: Object.keys(expensesByCategory).map(getColorForCategory),
-      }]
-    };
-
-    new Chart(this.$refs.secondCanvas, {
-      type: 'pie', 
-      data: categoryData,
-      options: {
-        // настройки диаграммы
-      }
-    });
-
+    ctx.restore();
   }
 };
+
+
+
+export default {
+  name: 'FinancialChart',
+  computed: {
+    ...mapState({
+      budget: state => state.budget,
+      categories: state => state.categories,
+      categoryBudgets: state => state.categoryBudgets,
+      expenses: state => state.expenses
+    }),
+    freeBudget() {
+    const totalBudget = this.budget;
+    const totalCategoryBudget = Object.values(this.categoryBudgets).reduce((sum, budget) => sum + budget, 0);
+    return totalBudget - totalCategoryBudget;
+    },
+    categoryBudgetData() {
+      const budgetCategoryNames = Object.keys(this.categoryBudgets);
+      const budgetData = budgetCategoryNames.map(categoryName => ({
+        category: categoryName,
+        budget: this.categoryBudgets[categoryName]
+      }));
+      const freeBudget = this.freeBudget
+
+      return {
+        labels: [...budgetCategoryNames, 'Free Budget'],
+        datasets: [{
+          data: [...budgetData.map(cat => cat.budget), freeBudget],
+          backgroundColor: [...budgetCategoryNames.map(getRandomColor), 'grey']
+        }]
+      };
+    },
+    expenseBudgetComparisonData() {
+      const categoryBudgetData = Object.entries(this.categoryBudgets).map(([category, budget]) => {
+        const totalExpense = this.expenses
+          .filter(expense => expense.category === category)
+          .reduce((sum, exp) => sum + exp.amount, 0);
+        return {
+          category,
+          remainingBudget: budget - totalExpense
+        };
+      });
+
+      return {
+        labels: categoryBudgetData.map(data => data.category),
+        datasets: [{
+          data: categoryBudgetData.map(data => data.remainingBudget),
+          backgroundColor: categoryBudgetData.map(() => getRandomColor())
+        }]
+      };
+    },
+  },
+  
+  mounted() {
+    const doughnutCtx = this.$refs.canvas.getContext('2d');
+    const freeBudgetValue = this.freeBudget || 'No data';
+    const doughnutChart = new Chart(doughnutCtx, {
+      type: 'doughnut',
+      data: this.categoryBudgetData,
+      options: {
+        plugins: {
+          doughnutTextPlugin: {
+            centerText: 'Free Budget = ' + freeBudgetValue
+          }
+        }
+      },
+      plugins: [doughnutTextPlugin]
+    });
+
+      const barCtx = this.$refs.secondCanvas.getContext('2d');
+      const barChart = new Chart(barCtx, {
+      type: 'bar',
+      data: this.expenseBudgetComparisonData,
+      options: {
+        plugins: {
+          title: {
+            display: true,
+            text: 'Budget Remaining'
+          },
+          legend: {
+            display: false,
+          }
+        }
+      }
+  });
+}
+};
+
 function getRandomColor() {
   const letters = '0123456789ABCDEF';
   let color = '#';
@@ -86,20 +128,16 @@ function getRandomColor() {
   return color;
 }
 
-function getColorForCategory(category) {
-  if (category === 'Undefined') {
-    return 'grey'; 
-  }
-  return getRandomColor(); 
-}
-
 </script>
+
 
 <style>
 .charts {
   display: flex;
-  justify-content: space-around;
-  max-width: 400px;
+  justify-content: center;
+  align-items: center;
+  max-width: 30vw;
 }
+
 
 </style>

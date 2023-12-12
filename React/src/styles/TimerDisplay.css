@@ -1,0 +1,44 @@
+.timer-display {
+  font-size: 48px;
+  text-align: center;
+  margin-top: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.timer-progress {
+  height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid white;
+  border-radius: 50%;
+}
+
+.timer-display.work .react-circular-progressbar-path {
+  stroke: #00008b;
+}
+
+.timer-display.break .react-circular-progressbar-path {
+  stroke: #009c00;
+}
+
+.timer-display .react-circular-progressbar-trail {
+  stroke: transparent;
+}
+
+.toggle-btn {
+  margin: 20px;
+  background-color: #00008b;
+  width: 100px;
+  height: 40px;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family:monospace;
+}
